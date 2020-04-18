@@ -64,7 +64,7 @@ namespace Text2Images
 		{
 			System.IO.Directory.CreateDirectory(textBoxOutput.Text);
 
-			var arrayLines = lines.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+			var arrayLines = lines.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
 			var headLen = lines.Count().ToString().Length;
 			var headFmt = $"D{headLen}";
 
@@ -90,7 +90,21 @@ namespace Text2Images
 				size = new Size(size.Width + (drawOptions.PaddingHorizontal * 2), size.Height + (drawOptions.PaddingVertical * 2));
 				Bitmap bmp = new Bitmap(size.Width, size.Height);
 
-				using (Graphics g = Graphics.FromImage(bmp))
+                // Deal with empty lines by producing a small transparent image (png). 
+                // Reason: another app downstream requires it be this way. And also,
+                // If the end user doesn't need transparent PNG files, they can simply
+                // be aware not leave any blank lines on their input.
+                if (text.Length < 1)
+                {
+                    Color backColor = bmp.GetPixel(0, 0); // GetPixel(1, 1); 
+                    bmp.MakeTransparent(backColor);
+                    bmp.Save(fileStream, System.Drawing.Imaging.ImageFormat.Png);
+                    bmp.Dispose();
+                    return;
+                }
+
+                //Deal with non-empty lines by producing an image showing the contents of the line of text.
+                using (Graphics g = Graphics.FromImage(bmp))
 				{
 					g.FillRectangle(drawOptions.BackBrush, new Rectangle(0, 0, size.Width, size.Height));
 					g.DrawString(text, drawOptions.Font, drawOptions.ForeBrush, drawOptions.PaddingHorizontal, drawOptions.PaddingVertical);
