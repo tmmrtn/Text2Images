@@ -75,7 +75,7 @@ namespace Text2Images
 			{
 				var line = arrayLines[index];
 				var name = (line.Length > fileLen ? line.Substring(0, fileLen) : line).Replace("\\", "").Replace("/", "");
-				var file = System.IO.Path.Combine(textBoxOutput.Text, $"{(index + 1).ToString(headFmt)}.{name}.jpg");
+				var file = System.IO.Path.Combine(textBoxOutput.Text, $"{(index + 1).ToString(headFmt)}.{name}.png");
 
 				CreateTextImage(line, drawOptions, file);
 			}
@@ -96,7 +96,7 @@ namespace Text2Images
 					g.DrawString(text, drawOptions.Font, drawOptions.ForeBrush, drawOptions.PaddingHorizontal, drawOptions.PaddingVertical);
 				}
 
-				bmp.Save(fileStream, System.Drawing.Imaging.ImageFormat.Jpeg);
+				bmp.Save(fileStream, System.Drawing.Imaging.ImageFormat.Png);
 				bmp.Dispose();
 			}
 		}
